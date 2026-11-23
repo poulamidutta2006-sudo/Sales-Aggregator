@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Add New Data</h1>
+  <span class="pill pill-green">SQL Auto-Save Active • Date Auto-Recorded <span class="dot"></span></span>
+</div>
+
+<div class="grid-eq">
+  <div class="card">
+    <h2>Log New Transaction</h2>
+    <form method="POST" action="/add">
+      <label class="field" style="margin-top:0">Today's Premium Threshold</label>
+      <select name="threshold" class="input">
+        {% for t in thresholds %}<option value="{{ t }}" {{ 'selected' if t == threshold }}>{{ t|inr }}</option>{% endfor %}
+      </select>
+      <label class="field">Product Name</label>
+      <input class="input" type="text" name="product" placeholder="e.g., MacBook Pro" required>
+      <label class="field">Customer Name</label>
+      <input class="input" type="text" name="customer" placeholder="e.g., Aarav S." required>
+      <label class="field">Amount (₹)</label>
+      <input class="input" type="number" name="amount" min="1" step="any" placeholder="e.g., 124000" required>
+      <div class="seg">
+        <input type="radio" id="t-sale" name="type" value="sale" checked><label for="t-sale">Sale / Earned</label>
+        <input type="radio" id="t-refund" name="type" value="refund"><label for="t-refund">Refund / Loss</label>
+      </div>
+      <button type="submit" class="btn btn-full">Save Entry to SQL</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Today's Newly Added Data</h2>
+    <table>
+      <thead><tr><th>Time</th><th>Product</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for s in entries %}
+        <tr>
+          <td>{{ s.created_at|hm }}</td><td>{{ s.product }}</td><td>{{ s.customer }}</td><td>{{ s.amount|inr }}</td>
+          <td>{% if s.category == 'Premium' %}<span class="badge b-premium">Premium</span>
+              {% elif s.category == 'Refund' %}<span class="badge b-refund">Refund</span>
+              {% else %}<span class="badge b-regular">Regular</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No entries added today yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="banner">Python List Comprehension Ready • Auto-syncing to 30-Day Dashboard</div>
+  </div>
+</div>
+{% endblock %}

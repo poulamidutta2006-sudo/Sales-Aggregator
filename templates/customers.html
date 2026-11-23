@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Customers</h1>
+  <span class="pill pill-purple">Last 30 Days</span>
+  <input id="search1" class="search" type="text" placeholder="Search customers..." onkeyup="filterTable('search1','tbl')">
+</div>
+
+<div class="grid-3 kpi-wrap">
+  <div class="card kpi"><div><div class="label">Total Customers</div><div class="value">{{ total }}</div></div><div class="icon i-teal">☺</div></div>
+  <div class="card kpi"><div><div class="label">Premium Buyers</div><div class="value">{{ premium_buyers }}</div></div><div class="icon i-purple">♛</div></div>
+  <div class="card kpi"><div><div class="label">Repeat Customers</div><div class="value">{{ repeat }}</div></div><div class="icon i-teal">↻</div></div>
+</div>
+
+<div class="card">
+  <h2>Customer Directory (SQL Synced)</h2>
+  <table id="tbl">
+    <thead><tr><th>Customer Name</th><th>Orders (30d)</th><th>Total Spent</th><th>Last Purchase</th><th>Tier</th></tr></thead>
+    <tbody>
+      {% for c in rows %}
+      <tr>
+        <td>{{ c.name }}</td><td>{{ c.orders }}</td><td>{{ c.spent|inr }}</td><td>{{ c.last|dmy }}</td>
+        <td>{% if c.tier == 'VIP Premium' %}<span class="badge b-vip">VIP Premium</span>
+            {% elif c.tier == 'Premium' %}<span class="badge b-premium">Premium</span>
+            {% else %}<span class="badge b-regular">Regular</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

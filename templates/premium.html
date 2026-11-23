@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Premium Sales</h1>
+  <select class="pill-select" onchange="location='/premium?threshold=' + this.value">
+    {% for t in thresholds %}<option value="{{ t }}" {{ 'selected' if t == threshold }}>Threshold: &gt; {{ t|inr }}</option>{% endfor %}
+  </select>
+  <!-- The number inside the code pill updates with the chosen threshold -->
+  <span class="pill pill-code">[s for s in sales if s &gt; {{ threshold }}]</span>
+</div>
+
+<div class="grid-3 kpi-wrap">
+  <div class="card kpi"><div><div class="label">Extracted Premium Sales</div><div class="value">{{ premium_sales|length }}</div></div><div class="icon i-blue">$</div></div>
+  <div class="card kpi"><div><div class="label">Premium Revenue (30 Days)</div><div class="value">{{ revenue|inr }}</div></div><div class="icon i-purple">₹</div></div>
+  <div class="card kpi"><div><div class="label">Avg. Premium Ticket</div><div class="value">{{ average|inr }}</div></div><div class="icon i-teal">≈</div></div>
+</div>
+
+<div class="card">
+  <div class="card-head">
+    <h2>Filtered High-Value Transactions</h2>
+    <input id="search" class="search" type="text" placeholder="Search transactions..." onkeyup="filterTable('search','tbl')">
+  </div>
+  <table id="tbl">
+    <thead><tr><th>Date</th><th>Product</th><th>Customer</th><th>Amount</th><th>Badge</th></tr></thead>
+    <tbody>
+      {% for s in premium_sales %}
+      <tr><td>{{ s.created_at|dmy }}</td><td>{{ s.product }}</td><td>{{ s.customer }}</td><td>{{ s.amount|inr }}</td>
+          <td><span class="badge b-premium">Premium</span></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Monthly Reports</h1>
+  <span class="pill pill-purple">30-Day Rolling Window • Auto-Generated</span>
+  <div class="right no-print">
+    <button class="btn" onclick="window.print()">Export PDF</button>
+    <a href="/export.csv" class="btn btn-outline">Export CSV</a>
+  </div>
+</div>
+
+<div class="card">
+  <h2>30-Day Daily Sales Volume (Earned vs. Loss)</h2>
+  <div class="chart-box"><canvas id="bars"></canvas></div>
+</div>
+
+<div class="grid-eq">
+  <div class="card">
+    <h2>Net Monthly Summary</h2>
+    <div class="row"><span>Gross Earned</span><b>{{ gross|inr }}</b></div>
+    <div class="row"><span>Total Loss / Refunds</span><b>{{ total_loss|inr }}</b></div>
+    <div class="row"><b>Net Profit</b><span class="purple-text">{{ net|inr }}</span></div>
+    <div class="row"><span>Premium Share</span><span class="teal-text">{{ share }}%</span></div>
+  </div>
+  <div class="card">
+    <h2>Top High-Value Days</h2>
+    {% for d, amount in top_days %}
+    <div class="top-day"><span class="num {{ 'n1' if loop.index == 1 }}">{{ loop.index }}</span>
+      <span>{{ d|dmy }} —</span><span class="amt">{{ amount|inr }}</span></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Grouped bar chart: purple = revenue, red-orange = refunds/loss
+  new Chart(document.getElementById('bars'), {
+    type: 'bar',
+    data: { labels: {{ labels|tojson }},
+      datasets: [
+        { label: 'Revenue', data: {{ revenue|tojson }}, backgroundColor: '#6D28D9', borderRadius: 3 },
+        { label: 'Refunds/Loss', data: {{ loss|tojson }}, backgroundColor: '#EF5B3F', borderRadius: 3 } ] },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } },
+      scales: { y: { ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } } } }
+  });
+</script>
+{% endblock %}

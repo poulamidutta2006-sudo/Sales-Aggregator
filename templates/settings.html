@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Settings</h1>
+  <span class="pill pill-green">Configuration Utility <span class="dot"></span></span>
+</div>
+<p class="subtitle">Configure thresholds, 30-day automation, and SQL storage</p>
+
+<form method="POST" action="/settings">
+  <div class="card">
+    <h2>Threshold &amp; Calculation Preferences</h2>
+    <div class="grid-eq">
+      <div>
+        <label class="field" style="margin-top:0">Default Daily Premium Threshold</label>
+        <select name="threshold" class="input">
+          {% for t in thresholds %}<option value="{{ t }}" {{ 'selected' if t == threshold }}>{{ t|inr }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="field" style="margin-top:0">Currency</label>
+        <select name="currency" class="input"><option value="INR" selected>INR (₹)</option></select>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;margin-top:18px">
+      <span>Auto-Calculate Rolling 30-Day Window (Backend)</span>
+      <label class="switch"><input type="checkbox" name="auto_calc" {{ 'checked' if auto_calc }}><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>SQL Database &amp; System Status</h2>
+    <div class="row"><span>SQLite / SQL Local Engine</span><span class="badge b-premium">Connected</span></div>
+    <div class="row"><span>Auto-Timestamp Entries</span><b>Enabled</b></div>
+    <div class="row"><span>Total Records Stored</span><b>{{ total_records }}</b></div>
+    <div style="display:flex;gap:12px;margin-top:16px;align-items:center">
+      <button type="submit" class="btn">Save Changes</button>
+      <a href="/backup" class="btn btn-outline">Backup SQL Database</a>
+      {% if saved %}<span class="teal-text">✓ Settings saved</span>{% endif %}
+    </div>
+  </div>
+</form>
+{% endblock %}

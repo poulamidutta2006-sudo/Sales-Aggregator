@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="header">
+  <h1>Dashboard</h1>
+  <span class="pill">Last 30 Days • Auto-Calculated</span>
+  <!-- Changing the dropdown reloads the page with ?threshold=... -->
+  <select class="pill-select" onchange="location='/?threshold=' + this.value">
+    {% for t in thresholds %}
+    <option value="{{ t }}" {{ 'selected' if t == threshold }}>Threshold: {{ t|inr }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="grid-4 kpi-wrap">
+  <div class="card kpi"><div><div class="label">Total Earned</div><div class="value">{{ total_earned|inr }}</div></div><div class="icon i-purple">₹</div></div>
+  <div class="card kpi"><div><div class="label">Total Loss</div><div class="value">{{ total_loss|inr }}</div></div><div class="icon i-red">↘</div></div>
+  <div class="card kpi"><div><div class="label">Total Customers</div><div class="value">{{ total_customers }}</div></div><div class="icon i-teal">☺</div></div>
+  <div class="card kpi"><div><div class="label">High-Value Sales</div><div class="value">{{ premium_count }} <small>&gt; {{ threshold|inr }}</small></div></div><div class="icon i-blue">$</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="card"><h2>30-Day Revenue &amp; Sales Trend</h2><div class="chart-box"><canvas id="trend"></canvas></div></div>
+  <div class="card"><h2>Premium vs. Regular Sales</h2><div class="chart-box"><canvas id="donut"></canvas></div></div>
+</div>
+
+<div class="card">
+  <div class="card-head"><h2>New Data &amp; Latest Entries</h2><a href="/add" class="btn btn-dark">+ Add New Data</a></div>
+  <table>
+    <thead><tr><th>Date</th><th>Product</th><th>Customer</th><th>Amount</th><th>Category</th></tr></thead>
+    <tbody>
+      {% for s in latest %}
+      <tr>
+        <td>{{ s.created_at|dmy }}</td><td>{{ s.product }}</td><td>{{ s.customer }}</td><td>{{ s.amount|inr }}</td>
+        <td>{% if s.category == 'Premium' %}<span class="badge b-premium">Premium</span>
+            {% elif s.category == 'Refund' %}<span class="badge b-refund">Refund</span>
+            {% else %}<span class="plain">Regular</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Line/area chart: daily revenue for the last 30 days
+  new Chart(document.getElementById('trend'), {
+    type: 'line',
+    data: { labels: {{ labels|tojson }},
+      datasets: [{ data: {{ revenue|tojson }}, borderColor: '#7C3AED', backgroundColor: 'rgba(124,58,237,.18)',
+                   fill: true, tension: 0.4, pointRadius: 0 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { y: { ticks: { callback: v => '₹' + v.toLocaleString('en-IN') } } } }
+  });
+  // Donut chart: premium vs regular sale counts
+  new Chart(document.getElementById('donut'), {
+    type: 'doughnut',
+    data: { labels: ['Premium', 'Regular'],
+      datasets: [{ data: [{{ premium_count }}, {{ regular_count }}], backgroundColor: ['#7C3AED', '#14B8A6'], borderWidth: 0 }] },
+    options: { maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'right' } } }
+  });
+</script>
+{% endblock %}

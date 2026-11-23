@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Aggregator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Sidebar: written ONCE here, shown on every page. request.endpoint tells us which page is open. -->
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-icon"></div><div>Sales<br>Aggregator</div></div>
+    <nav class="menu">
+      <a href="/" class="{{ 'active' if request.endpoint == 'dashboard' }}">▦ Dashboard</a>
+      <a href="/add" class="{{ 'active' if request.endpoint == 'add' }}">⊕ Add New Data</a>
+      <a href="/premium" class="{{ 'active' if request.endpoint == 'premium' }}">◇ Premium Sales</a>
+      <a href="/customers" class="{{ 'active' if request.endpoint == 'customers' }}">☺ Customers</a>
+      <a href="/reports" class="{{ 'active' if request.endpoint == 'reports' }}">▥ Monthly Reports</a>
+    </nav>
+    <nav class="menu bottom">
+      <a href="/settings" class="{{ 'active' if request.endpoint == 'settings' }}">⚙ Settings</a>
+      <a href="#">◯ Profile</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    // Simple search: hides table rows that don't contain the typed text
+    function filterTable(inputId, tableId) {
+      var text = document.getElementById(inputId).value.toLowerCase();
+      var rows = document.querySelectorAll('#' + tableId + ' tbody tr');
+      rows.forEach(function (row) {
+        row.style.display = row.innerText.toLowerCase().includes(text) ? '' : 'none';
+      });
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
